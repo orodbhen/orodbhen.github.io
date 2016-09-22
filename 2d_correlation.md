@@ -34,15 +34,15 @@ Because the DFT multiplication property is equivalent to a circular convolution,
 
 2D circular convolution can be visualized as a plain containing infinite adjacent copies of the zero-padded image. Rather than wrapping the zero-padded kernel around, it can be visualized as linear convolution with the lower-right copy, with adjacent copies providing the "history."
 
-    111100000 | 111100000
-    111100000 | 111100000
-    000000000 | 000000000
-    000000000 | 000000000
-    ----------------------
-    111100000 | 111100000
-    111100000 | 111100000
-    000000000 | 000000000
-    000000000 | 000000000
+    | 111100000 | 111100000 |
+    | 111100000 | 111100000 |
+    | 000000000 | 000000000 |
+    | 000000000 | 000000000 |
+    |------------------| -----------------|
+    | 111100000 | 111100000 |
+    | 111100000 | 111100000 |
+    | 000000000 | 000000000 |
+    | 000000000 | 000000000 |
 
 For correlation with a 2x2 kernel, you could change it to this:
 
