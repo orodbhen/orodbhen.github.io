@@ -27,9 +27,9 @@ I tried flipping the the kernel before computing the DFT, and that produced the 
 
 On closer inspection, I discovered that the erroneous correlation result resembles the correct result, but shifted up and to the left. The former was displayed in scientific notation, so it was hard to see the pattern at first.
 
-The reason is that taking the conjugate is equivalent to flipping the whole zero-padded kernel, and not just the original kernel (which is what we want). 
+The reason is that taking the conjugate of a zero-padded kernel flips the whole zero-padded kernel, and not just the original kernel (which is what we want). 
 
-The naive response would be to simply select another ROI from the output. However, the result is actually shifted circularly, so that wouldn't work. The correct result is present, but disjoint. 
+Because the result is a shifted version of the correct result, the naive solution would be to simply select another ROI from the output. However, the result is actually shifted circularly, so that wouldn't work. The correct result is present, but disjoint. 
 
 There are two possible solutions: flip the kernel before zero-padding it and computing the DFT, or change the location of the image in the zero-pad buffer. 
 
