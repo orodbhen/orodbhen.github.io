@@ -96,7 +96,11 @@ Carrying this over to 2D, after zero-padding our 2x2 kernel and conjugating its 
     000000000
     100000001
 
-It's difficult to visualize how to index the correlation using this kernel. However, in 1D, this can be interpreted as flipping the array, and then circular shifting by one to the right. In 2D, it flips the kernel vertically and horizontally, and then circular shifts it down and right by one. What this means is that the kernel will be up and to the left by one more than expected at the start of convolution. I'll scale the kernel by 2 to make this easier to show. So instead of this (kernel 2s, image 1s) :
+It's difficult to visualize how to index the correlation using this kernel. However, in 1D, this can be interpreted as flipping the array, and then circular shifting by one to the right. In 2D, it flips the array vertically and horizontally, and then circular shifts it down and right by one.
+
+What this means is that the kernel will be up and to the left by one more than expected at the start of convolution. Therefore, the image must also be shifted by one, down and to the right. You might be asking, shouldn't that be "up and to the left," like the kernel. But remember that the kernel will be flipped again before convolving it with the image, which means it will end up down and to the right. Again, this is an implicit flip, because we'll be convolving in the spectral domain by multiplying both arrays element-wise. 
+
+I'll scale the kernel by 2 to make this easier to show. So instead of this (kernel 2s, image 1s) :
 
     000000000
     022000000
