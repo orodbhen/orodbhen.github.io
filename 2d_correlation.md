@@ -1,3 +1,6 @@
+A Visual Tutorial on 2D Cross Correlation in C++ and Python
+-------------------------------------------------------------
+
 I have a program that uses OpenCV to compute either the convolution or cross-correlation of an image with a specified kernel. I compute cross-correlation by setting the conjB flag to true when calling [cv::mulSpectrums][1].
 
 Initially, convolution consistently produced correct results, but the result of cross-correlation was always wrong.
