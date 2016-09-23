@@ -6,16 +6,17 @@ Based on the convolution results, the spectra of the kernel and image are correc
 
 I'm comparing the result with the output from scipy.signal.correlate, using Python. I tried flipping the the kernel before computing the DFT, and that produces the correct cross-correlation. 
 
-    cv::dft( dft_buf, dft_buf, 1, img_in.rows );
-    cv::mulSpectrums( dft_buf, kernel_dft, dft_buf, 0, CORRELATE );
-    dft( dft_buf, dft_buf, cv::DFT_INVERSE + cv::DFT_SCALE, kernel.rows/2 + img_in.rows );
+```C++
+cv::dft( dft_buf, dft_buf, 1, img_in.rows );
+cv::mulSpectrums( dft_buf, kernel_dft, dft_buf, 0, CORRELATE );
+dft( dft_buf, dft_buf, cv::DFT_INVERSE + cv::DFT_SCALE, kernel.rows/2 + img_in.rows );
 
-    int col_offset = ( kernel.cols % 2 ) ? ( kernel.cols/2 ) : ( kernel.cols/2 - 1 ); // is odd?
-    int row_offset = ( kernel.rows % 2 ) ? ( kernel.rows/2 ) : ( kernel.rows/2 - 1 );
+int col_offset = ( kernel.cols % 2 ) ? ( kernel.cols/2 ) : ( kernel.cols/2 - 1 ); // is odd?
+int row_offset = ( kernel.rows % 2 ) ? ( kernel.rows/2 ) : ( kernel.rows/2 - 1 );
 
-    cv::Mat result_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
-    result_roi.copyTo( img_out );
- 
+cv::Mat result_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
+result_roi.copyTo( img_out );
+```
 
   [1]: http://docs.opencv.org/modules/core/doc/operations_on_arrays.html#mulspectrums
 
