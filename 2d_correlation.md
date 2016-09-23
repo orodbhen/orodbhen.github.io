@@ -101,24 +101,24 @@ Remember that I'm showing the wrapped portion of the kernel buffer here, at the 
 This is hard to really show without an animation, but this is the best I could do here.
 
 Here's the code:
+```C++
+// copy image to buffer
+int col_offset = ( CORRELATE ) ? ( kernel.cols - 1 ) : ( 0 );
+int row_offset = ( CORRELATE ) ? ( kernel.rows - 1 ) : ( 0 );
+cv::Mat image_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
+img_in.copyTo( image_roi );
 
-    // copy image to buffer
-    int col_offset = ( CORRELATE ) ? ( kernel.cols - 1 ) : ( 0 );
-    int row_offset = ( CORRELATE ) ? ( kernel.rows - 1 ) : ( 0 );
-    cv::Mat image_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
-    img_in.copyTo( image_roi );
+// Compute DFT of image, and multiply it with kernel DFT
+int non_zero_rows = ( CORRELATE ) ? ( img_in.rows + kernel.rows - 1 ) : ( img_in.rows );
+cv::dft( dft_buf, dft_buf, 0, non_zero_rows );
+cv::mulSpectrums( dft_buf, kernel_dft, dft_buf, 0, CORRELATE );
 
-    // Compute DFT of image, and multiply it with kernel DFT
-    int non_zero_rows = ( CORRELATE ) ? ( img_in.rows + kernel.rows - 1 ) : ( img_in.rows );
-    cv::dft( dft_buf, dft_buf, 0, non_zero_rows );
-    cv::mulSpectrums( dft_buf, kernel_dft, dft_buf, 0, CORRELATE );
+// Compute IDFT
+dft( dft_buf, dft_buf, cv::DFT_INVERSE + cv::DFT_SCALE, kernel.rows/2 + img_in.rows );
 
-    // Compute IDFT
-    dft( dft_buf, dft_buf, cv::DFT_INVERSE + cv::DFT_SCALE, kernel.rows/2 + img_in.rows );
-
-    // Select ROI from result, and either copy or pass reference to output buffer
-    col_offset = ( kernel.cols % 2 ) ? ( kernel.cols/2 ) : ( kernel.cols/2 - 1 ); // is odd?
-    row_offset = ( kernel.rows % 2 ) ? ( kernel.rows/2 ) : ( kernel.rows/2 - 1 );
-    cv::Mat result_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
-    result_roi.copyTo( img_out );
-
+// Select ROI from result, and either copy or pass reference to output buffer
+col_offset = ( kernel.cols % 2 ) ? ( kernel.cols/2 ) : ( kernel.cols/2 - 1 ); // is odd?
+row_offset = ( kernel.rows % 2 ) ? ( kernel.rows/2 ) : ( kernel.rows/2 - 1 );
+cv::Mat result_roi( dft_buf, cv::Rect( col_offset, row_offset, img_in.cols, img_in.rows ) );
+result_roi.copyTo( img_out );
+```
