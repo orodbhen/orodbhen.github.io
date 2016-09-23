@@ -25,7 +25,7 @@ result_roi.copyTo( img_out );
 
 I tried flipping the the kernel before computing the DFT, and that produced the correct cross-correlation. 
 
-On closer inspection, I discovered that the erroneous correlation result resembles the correct result, but shifted up and to the left. The former was displayed in scientific format, so it was hard to see the pattern at first.
+On closer inspection, I discovered that the erroneous correlation result resembles the correct result, but shifted up and to the left. The former was displayed in scientific notation, so it was hard to see the pattern at first.
 
 The reason is that taking the conjugate is equivalent to flipping the whole zero-padded kernel, and not just the original kernel (which is what we want). 
 
