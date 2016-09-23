@@ -34,11 +34,9 @@ Because the result is a shifted version of the correct result, the naive solutio
 There are two possible solutions: 
 
 1. Flip the kernel before zero-padding it and then compute the DFT, 
-2. Change the location of the image in the zero-pad buffer, so it lines up correctly with the conjugate of the zero-padded kernel.  
+2. Change the location of the image in the zero-pad buffer.
 
-I chose to do the latter. So instead of placing the upper-left element of the image in the upper-left corner of the buffer, I placed it at `(kernel.cols-1, kernel.rows-1)`. The upper-left element of the kernel is placed at `(0, 0)`, but taking the conjugate flips it vertically and horizontally, as previously explained. Computing the DFTs of both and then multiplying them is equivalent to circular convolution in the spatial domain, which means that the kernel is implicitly flipped again (in the spatial domain). 
-
-Because the DFT multiplication property is equivalent to a circular convolution, the kernel buffer wraps around diagonally. So it will be the trailing portion, or "wrapped" part of the kernel buffer that "slides" across the image, and not the leading edge. 
+I chose to do the latter. The idea is that, by shifting the image you also shift the result, so that all elemements in the result are contained in one region of interest.
 
 2D circular convolution can be visualized as a plain containing infinite adjacent copies of the zero-padded image. Rather than wrapping the zero-padded kernel around, it can be visualized as linear convolution with the lower-right copy, with adjacent copies providing the "history."
 
@@ -52,13 +50,13 @@ Because the DFT multiplication property is equivalent to a circular convolution,
      000000000 | 000000000 
      000000000 | 000000000 
 
-For correlation with a 2x2 kernel, you could change it to this:
+For correlation with a 2x2 kernel, you would change it to this:
 
     000000000 | 000000000
     011110000 | 011110000
     011110000 | 011110000
     000000000 | 000000000
-    ----------------------
+    ----------|-----------
     000000000 | 000000000
     011110000 | 011110000
     011110000 | 011110000
@@ -98,23 +96,34 @@ Carrying this over to 2D, after zero-padding our 2x2 kernel and conjugating its 
 
 It's difficult to visualize how to index the correlation using this kernel. However, in 1D, this can be interpreted as flipping the array, and then circular shifting by one to the right. In 2D, it flips the array vertically and horizontally, and then circular shifts it down and right by one.
 
-What this means is that the kernel will be up and to the left by one more than expected at the start of convolution. Therefore, the image must also be shifted by one, down and to the right. You might be asking, shouldn't that be "up and to the left," like the kernel. But remember that the kernel will be flipped again before convolving it with the image, which means it will end up down and to the right. Again, this is an implicit flip, because we'll be convolving in the spectral domain by multiplying both arrays element-wise. 
+ Recall that the image needs to be shifted in the buffer for the result to be contained in a single ROI. To acheive this, the upper left element of the image is placed at `(kernel.cols-1, kernel.rows-1)`, instead of at `(0. 0)`. The upper-left element of the kernel is placed at `(0, 0)`, but taking the conjugate flips it vertically and horizontally about `(0, 0)`, as previously explained. Computing the DFTs of both and then multiplying them is equivalent to circular convolution in the spatial domain, which means that the kernel is implicitly flipped again (in the spatial domain).
 
-I'll scale the kernel by 2 to make this easier to show. So instead of this (kernel 2s, image 1s) :
+Note that the upper left element of the result will be at `(0, 0)`, and not at `(kernel.cols-1, kernel.rows-1)`. This may seem counter-intutive, because the leading edge of the flipped kernel will have to shift to `(kernel.cols-1, kernel.rows-1)` before it begins to eclipse the image. However, the trailing portion of the kernel - i.e. the part that wraps around diagonally - eclipses the image at the beginning of the convolution. So it will be the trailing portion of the kernel, and not the leading edge, that "slides" across the image.
 
-    000000000
-    022000000
-    022111000
-    001111000
+Consider this example image, already copied into the zero-pad buffer:
 
-We have this (note that the image has been moved accordingly):
+    0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0
+    0 0 0 1 1 1 1 1 1
+    0 0 0 1 1 1 1 1 1
+    0 0 0 1 1 1 1 1 1
 
-    220000000
-    221110000
-    011110000
-    000000000
+And we'll correlate it with this kernel:
 
-Remember that I'm showing the wrapped portion of the kernel buffer here, at the start of convolution.
+    11 12 13 14
+    21 22 23 24
+    31 32 33 34
+    41 42 43 44
+    
+After zero-padding the kernel and conjugating it's DFT, the spatial representation is:
+    
+    22 23 24 0 0 0 0 0 21
+    32 33 34 0 0 0 0 0 31
+    42 43 44 0 0 0 0 0 41
+     0  0  0 0 0 0 0 0  0
+     0  0  0 0 0 0 0 0  0
+    12 13 14 0 0 0 0 0 11
 
 This is hard to really show without an animation, but this is the best I could do here.
 
