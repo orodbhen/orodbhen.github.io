@@ -89,7 +89,7 @@ The reason is that the value of x[n] at n=0 must remain the same after flipping,
     
 Again, the key is to think of a circular axis. 
 
-Carrying this over to 2D, our 2x2 kernel would actually look like this, after conjugating its DFT:
+Carrying this over to 2D, after zero-padding our 2x2 kernel and conjugating its DFT, this is what it would look like in the spatial domain:
 
     100000001
     000000000
