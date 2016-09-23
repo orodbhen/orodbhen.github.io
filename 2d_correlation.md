@@ -82,6 +82,12 @@ flips to:
 and not:
 
     [ 0, 0, 4, 3, 2, 1 ]
+    
+The reason is that the value of x[n] at n=0 must remain the same after flipping, i.e. it flips about the origin. The values to the right of n=0 can be thought of as being for n < 0. So the array of corresponding indices would be:
+
+    [ 0, -5, -4, -3, -2, -1 ]
+    
+Again, the key is to think of a circular axis. 
 
 Carrying this over to 2D, our 2x2 kernel would actually look like this, after conjugating its DFT:
 
