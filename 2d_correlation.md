@@ -1,10 +1,10 @@
 I have a program that uses OpenCV to compute either the convolution or cross-correlation of an image with a specified kernel. I compute cross-correlation by setting the conjB flag to true when calling [cv::mulSpectrums][1].
 
-Convolution consistently produces correct results. However, the result of cross-correlation is always wrong.
+Initially, convolution consistently produced correct results, but the result of cross-correlation was always wrong.
 
-Based on the convolution results, the spectra of the kernel and image are correct. The only change is that the kernel spectrum is conjugated before multiplying. Both were computed using cv::dft, and so are in the CCS-packed format expected by mulSpectrums. 
+The only difference is that the kernel spectrum is conjugated before multiplying. Both were computed using `cv::dft`, and so are in the `CCS-packed` format expected by `mulSpectrums`. 
 
-I'm comparing the result with the output from scipy.signal.correlate, using Python. I tried flipping the the kernel before computing the DFT, and that produces the correct cross-correlation. 
+I compared the result with the output of my Python code using `scipy.signal.correlate`.
 
 ```C++
 cv::dft( dft_buf, dft_buf, 1, img_in.rows );
@@ -20,6 +20,7 @@ result_roi.copyTo( img_out );
 
   [1]: http://docs.opencv.org/modules/core/doc/operations_on_arrays.html#mulspectrums
 
+I tried flipping the the kernel before computing the DFT, and that produced the correct cross-correlation. 
 
 On closer inspection, I discovered that the erroneous correlation result resembles the correct result, but shifted up and to the left. The former was displayed in scientific format, so it was hard to see the pattern at first.
 
