@@ -31,9 +31,12 @@ The reason is that taking the conjugate of a zero-padded kernel flips the whole 
 
 Because the result is a shifted version of the correct result, the naive solution would be to simply select another ROI from the output. However, the result is actually shifted circularly, so that wouldn't work. The correct result is present, but disjoint. 
 
-There are two possible solutions: flip the kernel before zero-padding it and computing the DFT, or change the location of the image in the zero-pad buffer. 
+There are two possible solutions: 
 
-What I did was place the image with the upper-left corner at (kernel.cols-1, kernel.rows-1). The kernel is at (0,0), but taking the conjugate flips it vertically and horizontally. Multiplying the DFTs implicitly flips it again (convolution). 
+1. Flip the kernel before zero-padding it and then compute the DFT, 
+2. Change the location of the image in the zero-pad buffer, so it lines up correctly with the conjugate of the zero-padded kernel.  
+
+I chose to do the latter. So instead of placing the upper-left element of the image in the upper-left corner of the buffer, I placed it at `(kernel.cols-1, kernel.rows-1)`. The upper-left element of the kernel is placed at `(0, 0)`, but taking the conjugate flips it vertically and horizontally, as previously explained. Computing the DFTs of both and then multiplying them is equivalent to circular convolution in the spatial domain, which means that the kernel is implicitly flipped again (in the spatial domain). 
 
 Because the DFT multiplication property is equivalent to a circular convolution, the kernel buffer wraps around diagonally. So it will be the trailing portion, or "wrapped" part of the kernel buffer that "slides" across the image, and not the leading edge. 
 
